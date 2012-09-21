@@ -18,48 +18,66 @@
 
 chrome.extension.onMessage.addListener(
 	function(request, sender, sendResponse) {
-		spacestatus_update();
+		if ("list" in request) {
+			console.log("background: got request for list");
+			var req = new XMLHttpRequest();
+			req.open("GET", "http://openspace.slopjong.de/directory.json", true);
+			req.onload = function() {
+				var spaces = JSON.parse(req.responseText);
+				response = {"spaces": spaces, "selected": localStorage["spacestatus_url"]};
+				console.log("background: sending list response");
+				sendResponse(response);
+			};
+			req.send(null);
+			return true; /* this means we will send a response. */
+		} else if ("update" in request) {
+			console.log("background: got request to update.");
+			localStorage["spacestatus_space"] = request.update.space;
+			localStorage["spacestatus_url"] = request.update.url;
+			spacestatus_update();
+			return false; /* no response here. */
+		}
 	}
 );
 
-function spacestatus_readystatechange(req, proxied) {
+function spacestatus_readystatechange(req) {
 	return function() {
 		if (req.readyState != 4) {
-			console.log("request still running");
 			return;
 		}
 
 		if (req.status != 200) {
-			if (proxied) {
-				console.log("giving up");
-				settimeout(spacestatus_update, 900000);
-				return;
-			}
-
-			console.log("request failed. retrying with proxy");
-			req2 = new XMLHttpRequest();
-			req2.onreadystatechange = spacestatus_readystatechange(req2, true);
-			req2.open("POST", "http://hackerspaces.me/proxy", true);
-			req2.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-			req2.send('url=' + encodeURIComponent(localStorage["spacestatus_url"]));
+			console.log("request failed.");
+			console.log(req);
+			chrome.browserAction.setIcon({path: 'img/unknown.png'});
+			setTimeout(spacestatus_update, 90000);
 			return;
 		}
 
-		console.log("received response");
-		console.log(req);
-		var state = JSON.parse(req.responseText);
-		if (proxied)
-			state = state.body;
+		space_status = undefined;
+		try {
+			var state = JSON.parse(req.responseText);
+			if ("open" in state) {
+				if (state.open === true || state.open === "true") {
+					space_status = true;
+				} else if (state.open === false || state.open === "false") {
+					space_status = false;
+				}
+			}
+		} catch(err) {
+			console.log(err);
+		}
 
-		if (state.open === true) {
-			console.log("space is open");
-			chrome.browserAction.setIcon({path: 'img/open.png'});
-		} else if (state.open === false) {
-			console.log("space is closed");
-			chrome.browserAction.setIcon({path: 'img/closed.png'});
-		} else {
-				console.log("space is undefined");
+		switch (space_status) {
+			case true:
+				chrome.browserAction.setIcon({path: 'img/open.png'});
+				break;
+			case false:
+				chrome.browserAction.setIcon({path: 'img/closed.png'});
+				break;
+			default:
 				chrome.browserAction.setIcon({path: 'img/unknown.png'});
+				break;
 		}
 		setTimeout(spacestatus_update, 90000);
 	};
