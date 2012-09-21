@@ -1,0 +1,21 @@
+{
+	"name": "SpaceStatus",
+	"icons": {
+		"48": "img/logo-48.png",
+		"128": "img/logo-128.png"
+	},
+	"description": "Show the status of your hackerspace in chromium",
+	"version": "0.1",
+	"manifest_version": 2,
+	"browser_action": {
+		"default_icon": "img/unknown.png",
+		"default_popup": "html/popup.html"
+	},
+	"permissions": [
+		"http://openspace.slopjong.de/",
+		"http://hackerspaces.me/proxy"
+	],
+	"background": {
+		"scripts": ["js/background.js"]
+	}
+}
