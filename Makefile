@@ -3,7 +3,10 @@ ZIP:=zip
 
 all: extension zip
 
-extension:
+extension.pem:
+	$(CHROMIUM) --pack-extension=extension
+
+extension: extension.pem
 	$(CHROMIUM) --pack-extension=extension --pack-extension-key=extension.pem
 	echo "Success"
 
