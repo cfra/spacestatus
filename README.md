@@ -8,7 +8,7 @@ Download
 --------
 
 If you don't want to build the extension yourself, you can install it from
-[here](http://zeus.nowhere.ws/spacestatus.crx).
+[here](http://nowhere.ws/spacestatus.crx).
 
 Install
 -------
