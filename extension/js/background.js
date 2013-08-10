@@ -21,7 +21,7 @@ chrome.extension.onMessage.addListener(
 		if ("list" in request) {
 			console.log("background: got request for list");
 			var req = new XMLHttpRequest();
-			req.open("GET", "http://openspace.slopjong.de/directory.json", true);
+			req.open("GET", "http://spaceapi.net/directory.json", true);
 			req.onload = function() {
 				var spaces = JSON.parse(req.responseText);
 				response = {"spaces": spaces, "selected": localStorage["spacestatus_url"]};

@@ -5,7 +5,7 @@
 		"128": "img/logo-128.png"
 	},
 	"description": "Show the status of your hackerspace in chromium",
-	"version": "0.1",
+	"version": "0.1.1",
 	"manifest_version": 2,
 	"browser_action": {
 		"default_icon": "img/unknown.png",
